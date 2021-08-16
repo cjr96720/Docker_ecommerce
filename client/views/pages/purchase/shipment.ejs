@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <%- include('../../partials/header') -%>
+        <%- include('../../partials/styles') -%>
+</head>
+
+<body>
+    <%- include('../../partials/navbar.ejs') -%>
+        <%- include('../../partials/scripts') -%>
+            <div class="main">
+                <h1 class="fontCaveat" style="font-size: 46px; text-align: center; margin-top: 10px">
+                    Shipment
+                </h1>
+                <div class="formDiv">
+                    <div class="form-group" style="margin-top: 20px">
+                        <label for="name">Name: </label><span class="messSpan" id="nameMessage"></span>
+                        <input class="form-control" type="text" id="name" name="name" placeholder="Enter your name..."
+                            autocomplete="off" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="add">Address: </label><span class="messSpan" id="addMessage"></span>
+                        <input class="form-control" type="text" id="add" name="add" required />
+                    </div>
+                    <div class="form-group" style="text-align: center">
+                        <button style="width: 50%; margin-top: 20px" class="btn btn-secondary btn-sm" id="enter">
+                            <i>Enter</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                var nameFlag = false;
+                var addFlag = false;
+                var cart = JSON.parse(localStorage.getItem("cart"));
+                var cartid = parseInt(localStorage.getItem("cartid"));
+                var memberid = parseInt(localStorage.getItem("userid"));
+                
+                
+
+                $("#name").blur(function () {
+                    if ($("#name").val() === "") {
+                        $("#nameMessage").html("❌ Cannot be empty");
+                        nameFlag = false;
+                    } else {
+                        $("#nameMessage").html("👍");
+                        nameFlag = true;
+                    }
+                });
+
+                $("#add").blur(function () {
+                    if ($("#add").val() === "") {
+                        $("#addMessage").html("❌ Cannot be empty");
+                        addFlag = false;
+                    } else {
+                        $("#addMessage").html("👍");
+                        addFlag = true;
+                    }
+                });
+
+                $("#enter").click(function () {
+                    var address = $("#add").val();
+                    for (let i = 0; i < cart.length; i++) {
+                        var data = {
+                            cartid: cartid,
+                            memberid: memberid,
+                            itemid: cart[i].itemid,
+                            qty: cart[i].qty,
+                            memberAdd: address
+                        };
+                        // console.log(data);
+                        $.ajax({
+                            type: "post",
+                            url: "<%= process.env.PATH_PREFIX %>/api/cartdetail",
+                            data: JSON.stringify(data),
+                            contentType: "application/json;charset=utf-8",
+                            async: false,
+                        }).done(()=>{
+                            console.log('Thanks')
+                            localStorage.removeItem('total')
+                            localStorage.removeItem('cartItem')
+                            localStorage.removeItem('cartid')
+                            localStorage.removeItem('cartNumbers')
+                            localStorage.removeItem('cart')
+                            window.location.href = '/'
+                        }).fail();
+                    }
+                });
+            </script>
+</body>
+
+</html>

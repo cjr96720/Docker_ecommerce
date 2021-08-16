@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <%- include('../../partials/header') -%> <%-
+    include('../../partials/styles') -%>
+    <style>
+      button {
+        margin: 5px 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <%- include('../../partials/navbar.ejs') -%> <%-
+    include('../../partials/scripts') -%>
+    <div class="main">
+      <h1
+        class="fontCaveat"
+        style="font-size: 46px; text-align: center; margin-top: 10px"
+      >
+        Member Information
+      </h1>
+      <div class="memberCard">
+        <div class="info">
+          <label class="mamberInfoTitle">Member ID#: </label
+          ><span id="memberid" class="mamberPageInfo"></span>
+        </div>
+        <div class="info">
+          <label class="mamberInfoTitle">Name: </label
+          ><span id="name" class="mamberPageInfo"></span>
+        </div>
+        <div class="info">
+          <label class="mamberInfoTitle">Email: </label
+          ><span id="email" class="mamberPageInfo"></span>
+        </div>
+      </div>
+      <div style="text-align: center">
+        <button id="checkorder" class="btn btn-light m-2">Check Order</button>
+        <button id="cancel" class="btn btn-light m-2">Cancel Order</button>
+        <div id="orderid"></div>
+      </div>
+
+      <div class="" id="order"></div>
+    </div>
+    <script>
+      var memberid = localStorage.getItem("userid");
+      var userName = localStorage.getItem("userName");
+      var email = localStorage.getItem("userEmail");
+
+      $("#memberid").html(memberid);
+      $("#name").html(userName);
+      $("#email").html(email);
+
+      $("#checkorder").click(function () {
+        var data = {
+          memberid: memberid,
+        };
+        $.ajax({
+          type: "post",
+          url: "<%= process.env.PATH_PREFIX %>/api/checkorder",
+          data: JSON.stringify(data),
+          contentType: "application/json;charset=utf-8",
+          async: false,
+        })
+          .done(function (items) {
+            console.log(items);
+            var str = "";
+            str += '<table class="table table-striped table-hover">';
+            str += "<thead>";
+            str += '<tr style="font-weight: bold; font-size: 18px">';
+            str += "<td>Order#</td>";
+            str += "<td></td>";
+            str += "<td>Product</td>";
+            str += "<td>Catagory</td>";
+            str += "<td>Price/unit</td>";
+            str += "<td>Quantity</td>";
+            str += "<td>Status</td>";
+            str += "<td></td>";
+            str += "</tr>";
+            str += "</thead>";
+            str += "<tbody>";
+
+            $.each(items, function (index, item) {
+              str += "<tr>";
+              str += "<td>" + item.cartid + "</td>";
+              src = "/images/" + item.imgName;
+              // console.log(src);
+              str +=
+                '<td><img src="' +
+                src +
+                '" alt="404" style="width: 200px; height: 200px;"/></td>';
+              str += "<td>" + item.itemName + "</td>";
+              str += "<td>" + item.catagory + "</td>";
+              str +=
+                '<td style="text-overflow:ellipsis;white-space:nowrap;"> $ ' +
+                item.price +
+                "</td>";
+              str += "<td>" + item.qty + "</td>";
+              str += "<td>" + item.status + "</td>";
+              //   str +=
+              //     '<td><button onClick="cancel(id)" class="btn btn-light" id="' +
+              //     item.cartid +
+              //     '">Cancel</button></td>';
+              str += "</tr>";
+              //   str += "<tr><td><button onClick='cancel(id)' class='btn btn-light' id='" +
+              //     item.cartid +
+              //     "'>Cancel</button></td></tr>";
+            });
+            str += "</tbody>";
+            str += "</table>";
+            $("#order").html(str);
+            $("#order").addClass("orderDiv");
+          })
+          .fail();
+      });
+
+      $("#cancel").click(function () {
+        $("#orderid").html(
+          '<input class="form-control" style="width: 200px; margin: 10px auto;" type="text" id="oid" name="oid" required placeholder="Enter Order#...">' +
+            '<button id="enter" onClick="cancel()" class="btn btn-light m-2">Enter</button>'
+        );
+      });
+
+      function cancel() {
+        var cancelid = parseInt($("#oid").val());
+        console.log(cancelid);
+        var data = {
+          cartid: cancelid,
+          memberid: memberid,
+        };
+
+        $.ajax({
+          type: "put",
+          url: "<%= process.env.PATH_PREFIX %>/api/cancel",
+          data: JSON.stringify(data),
+          contentType: "application/json;charset=utf-8",
+        })
+          .done(function () {
+            location.reload();
+          })
+          .fail(function (err) {
+            alert("Error: " + err.errorText);
+          });
+      }
+
+    </script>
+  </body>
+</html>

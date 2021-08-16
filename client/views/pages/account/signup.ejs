@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <%- include('../../partials/header') -%>
+        <%- include('../../partials/styles') -%>
+</head>
+
+<body>
+    <%- include('../../partials/navbar.ejs') -%>
+        <%- include('../../partials/scripts') -%>
+            <div class="main">
+                <h1 class="fontCaveat" style="font-size: 46px; text-align: center; margin-top: 10px;">Sign Up</h1>
+                <div class="formDivSignup">
+                    <div class="form-group" name="name">
+                        <label for="name">Name: </label><span class="messSpan" id="nameMessage"></span>
+                        <input class="form-control" type="text" id="userName" name="name" placeholder="Enter your name"
+                            autocomplete="off" required>
+                    </div>
+                    <div class="form-group" name="email">
+                        <label for="email">Email: </label><span class="messSpan" id="emailMessage"></span>
+                        <input class="form-control" type="email" id="email" name="email" placeholder="Enter email"
+                            autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Password: </label><span class="messSpan" id="pwdlMessage"></span>
+                        <input class="form-control" type="password" id="pwd" name="pwd" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Confrim Password: </label>
+                        <input class="form-control" type="password" id="pwd2" name="pwd" required>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-secondary btn-sm" type="submit" id="enterBtn"><i>Enter</i></button>
+                        <!-- <button class="btn btn-secondary btn-sm" type="button"><i>Create Account</i></button> -->
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                var nameFlag = false;
+                var emailFlag = false;
+                var pwdFlag = false;
+
+                $('#userName').blur(function () {
+                    if ($('#userName').val() === '') {
+                        $('#nameMessage').html('❌ Cannot be empty');
+                        nameFlag = false;
+                    } else {
+                        $('#nameMessage').html('👍')
+                        nameFlag = true;
+                    }
+                })
+
+                $('#email').blur(function () {
+                    var emailCheck = $('#email').val();
+                    if (emailCheck === '') {
+                        $('#emailMessage').html('❌ Cannot be empty')
+                        emailFlag = false;
+                    } else {
+                        var data = { email: emailCheck }
+                        $.ajax({
+                            type: 'post',
+                            url: '<%= process.env.PATH_PREFIX %>/api/emailCheck',
+                            data: JSON.stringify(data),
+                            contentType: 'application/json;charset=utf-8'
+                        }).done(function (res) {
+                            if (res.length > 0) {
+                                $('#emailMessage').html('🤷‍♂️ Member exsits!');
+                                emailFlag = false;
+                            } else {
+                                $('#emailMessage').html('👍')
+                                emailFlag = true;
+                            }
+                        }).fail(function(err){
+                            alert('Error: ' + err.errorText);
+                        });
+                    }
+
+                })
+
+
+                $('#pwd').blur(function () {
+                    if ($('#pwd').val() === '') {
+                        $('#pwdlMessage').html('❌ Cannot be empty')
+                        pwdFlag = false;
+                    } else {
+                        $('#pwdlMessage').html('👍')
+                        pwdFlag = true;
+                    }
+                })
+
+                $('#enterBtn').click(function () {
+                    var name = $('#userName').val();
+                    var email = $('#email').val();
+                    var password = $('#pwd').val();
+                    var confirm = $('#pwd2').val();
+                    if (nameFlag && emailFlag && pwdFlag && password === confirm) {
+                        var memberInfo = {
+                            name: name,
+                            email: email,
+                            password: password
+                        };
+                        $.ajax({
+                            type: 'post',
+                            url: '<%= process.env.PATH_PREFIX %>/api/signup',
+                            data: JSON.stringify(memberInfo),
+                            contentType: 'application/json;charset=utf-8'
+                        }).done(function (result) {
+                            // console.log(result);
+                            alert('Welcome to Chris Enterprise');
+                            window.location.href = '/account/login';
+                        }
+                        ).fail(function (err) {
+                            alert('Error: ' + err.errorText);
+                        })
+                    } else {
+                        alert('Something is Wrong!')
+                    }
+
+
+                })
+            </script>
+
+</body>
+
+</html>

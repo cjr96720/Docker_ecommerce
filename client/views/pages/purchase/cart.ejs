@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <%- include('../../partials/header') -%> <%-
+    include('../../partials/styles') -%>
+  </head>
+
+  <body>
+    <%- include('../../partials/navbar.ejs') -%>
+    <div class="main">
+      <h1
+        class="fontCaveat"
+        style="font-size: 46px; text-align: center; margin-top: 10px"
+      >
+        Cart
+      </h1>
+      <div id="cart" class="cartDiv"></div>
+      <div style="text-align: center">
+        <button id="clear" class="btn btn-light m-2">Clear</button>
+        <button id="checkout" class="btn btn-light m-2">Check Out</button>
+      </div>
+    </div>
+
+    <%- include('../../partials/scripts') -%>
+  </body>
+  <script>
+    $("#clear").click(function () {
+      localStorage.removeItem("cartNumbers");
+      $("#badge").empty();
+      $("#cart").empty();
+      localStorage.removeItem("cart");
+      localStorage.removeItem("cartItem");
+      localStorage.removeItem("total");
+    });
+    var cart = JSON.parse(localStorage.getItem("cart"));
+    $(document).ready(function () {
+      // var cart = JSON.parse(localStorage.getItem("cart"));
+      // console.log(cart);
+      var str = "";
+      str += '<table class="table table-striped table-hover">';
+      str += "<thead>";
+      str += '<tr style="font-weight: bold; font-size: 18px;">';
+      str += "<td></td>";
+      str += "<td>Product</td>";
+      str += "<td>Catagory</td>";
+      str += "<td>Price</td>";
+      str += "<td>Quantity</td>";
+      str += "<td></td>";
+      str += "</tr>";
+      str += "</thead>";
+      str += "<tbody>";
+      var total = 0;
+      for (let i = 0; i < cart.length; i++) {
+        var data = {
+          itemid: cart[i].itemid,
+          qty: cart[i].qty,
+        };
+        // console.log(data);
+        $.ajax({
+          type: "post",
+          url: "<%= process.env.PATH_PREFIX %>/api/cart",
+          data: JSON.stringify(data),
+          contentType: "application/json;charset=utf-8",
+          async: false,
+        })
+          .done((item) => {
+            // console.log(item);
+            str += "<tr>";
+            src = "/images/" + item[0].imgName;
+            // console.log(src);
+            str +=
+              '<td><img src="' +
+              src +
+              '" alt="404" style="width: 200px; height: 200px;"/></td>';
+            str += "<td>" + item[0].itemName + "</td>";
+            str += "<td>" + item[0].catagory + "</td>";
+            str +=
+              '<td style="text-overflow:ellipsis;white-space:nowrap;"> $ ' +
+              item[0].price +
+              "</td>";
+            str +=
+              "<td style='text-align: center; display: flex; justify-content: space-between; width: 120px;' id='" +
+              item[0].itemid +
+              "'><button onClick='itemMinus(id)' class='btn btn-dark btn-sm m-2' style='font-weight: bolder' id = '" +
+              item[0].itemid +
+              "'>-</button>" +
+              cart[i].qty +
+              "<button onClick='itemPlus(id)' class='btn btn-dark btn-sm m-2' style='font-weight: bolder' id='" +
+              item[0].itemid +
+              "'>+</button></td>";
+            str += "</tr>";
+            total += item[0].price * cart[i].qty;
+          })
+          .fail(function (err) {
+            alert("Error: " + err.errorText);
+          });
+      }
+      str +=
+        "<tr><td style='text-align: right; font-weight: bold; font-size: 14px;'>Total</td><td></td><td></td><td></td><td style='text-align: right; font-weight: bold; font-size: 14px;'>$ " +
+        func(total) +
+        "</td>";
+      str += "</tbody>";
+      str += "</table>";
+      $("#cart").html(str);
+    });
+
+    function func(total) {
+      if (total != undefined) {
+        localStorage.setItem("total", total);
+        return total;
+      }
+      total = 0;
+      localStorage.setItem("total", total);
+      return total;
+    }
+
+    function itemMinus(id) {
+      var carNum = parseInt(localStorage.getItem("cartNumbers"));
+      for (let i = 0; i < cart.length; i++) {
+        console.log(cart[i]);
+        if (cart[i].itemid == id) {
+          if (cart[i].qty != 1) {
+            cart[i].qty--;
+            console.log(cart);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            carNum--;
+            localStorage.setItem("cartNumbers", carNum);
+            $("#badge").html(localStorage.getItem("cartNumbers"));
+            location.reload();
+            break;
+          } else {
+            cart.splice(i, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            carNum--;
+            localStorage.setItem("cartNumbers", carNum);
+            $("#badge").html(localStorage.getItem("cartNumbers"));
+            location.reload();
+          }
+        }
+      }
+    }
+
+    function itemPlus(id) {
+      var carNum = parseInt(localStorage.getItem("cartNumbers"));
+      for (let i = 0; i < cart.length; i++) {
+        console.log(cart[i]);
+        if (cart[i].itemid == id) {
+          cart[i].qty++;
+          console.log(cart);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          carNum++;
+          localStorage.setItem("cartNumbers", carNum);
+          $("#badge").html(localStorage.getItem("cartNumbers"));
+          location.reload();
+          break;
+        }
+      }
+    }
+
+    $("#checkout").click(function () {
+      var memberid = parseInt(localStorage.getItem("userid"));
+      var totalItems = parseInt(localStorage.getItem("cartNumbers"));
+      var totalCost = parseInt(localStorage.getItem("total"));
+      var data = {
+        memberid: memberid,
+        totalItems: totalItems,
+        totalCost: totalCost,
+      };
+      // console.log(data);
+      $.ajax({
+        type: "post",
+        url: "<%= process.env.PATH_PREFIX %>/api/checkout",
+        data: JSON.stringify(data),
+        contentType: "application/json;charset=utf-8",
+      })
+        .done(() => {
+          localStorage.removeItem('cartNumber');
+          $.ajax({ 
+            type: "get", 
+            url: "<%= process.env.PATH_PREFIX %>/api/cartid" 
+          })
+            .done((result) => {
+              // console.log(result[0]);
+              var cartid = result[0].cartid;
+              localStorage.setItem('cartid', cartid);
+              window.location.href = '/purchase/shipment';
+            })
+            .fail(function (err) {
+              alert("Error: " + err.errorText);
+            });
+          
+        })
+        .fail(function (err) {
+          alert("Error: " + err.errorText);
+        });
+    });
+  </script>
+</html>

@@ -1,0 +1,132 @@
+.fontCaveat {
+  font-family: "Caveat", cursive;
+}
+
+.formDiv {
+  height: 300px;
+  width: 400px;
+  margin: 10px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px solid black;
+  border-radius: 15px;
+}
+
+.signupDiv {
+  text-align: right;
+}
+
+.formDivSignup {
+  height: 400px;
+  width: 400px;
+  margin: 10px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px solid black;
+  border-radius: 15px;
+}
+
+.navbar-default {
+  background-color: rgb(49, 48, 48);
+  border-color: rgb(49, 48, 48);
+  border-radius: 0;
+}
+
+a.aHover:hover {
+  font-weight: bold;
+  font-size: 16px;
+}
+.messSpan {
+  float: right;
+  color: red;
+}
+
+.memberCard {
+  height: 300px;
+  width: 50%;
+  margin: 20px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px ridge white;
+  border-radius: 15px;
+}
+
+.itemsContainer {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px ridge white;
+  border-radius: 15px;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.stayTop {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.main {
+  margin-top: 60px;
+}
+
+.info {
+  margin: 30px auto;
+  width: 400px;
+}
+
+.cartDiv {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px ridge white;
+  border-radius: 15px;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.mamberPageInfo {
+  padding-left: 10px;
+  font-size: 20px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.mamberInfoTitle {
+  font-size: 20px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.orderDiv {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  padding: 20px;
+  border: 2px ridge white;
+  border-radius: 15px;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.gif{
+  width: 50%;
+  margin: 10px auto;
+  text-align: center;
+}
+
+.qrcode{
+  text-align: center;
+  margin-top: 30px;
+}
+
+.formDiv2 {
+  width: 300px;
+  margin: 10px auto;
+  text-align: left;
+  padding: 5px;
+  border: 2px solid white;
+}

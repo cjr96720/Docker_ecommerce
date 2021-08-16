@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+#     mysql_server_mid:
+#         container_name: mysql_server_mid
+#         build: ../mysql/
+#         command: --default-authentication-plugin=mysql_native_password
+#         restart: always
+     #    environment: 
+     #        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+     #        MYSQL_DATABASE: chrisProjectDB
+     #        MYSQL_USER: devuser
+     #        MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+     #    security_opt: 
+     #         - seccomp:unconfined
+     #    ports:
+     #         - 3308:3306
+     #    volumes: 
+     #         - mysql_server_mid-data:/var/lib/mysql
+     #    networks: 
+     #         - dev_mid
+
+    node_client:
+        container_name: node_client
+        build: ../client/
+        ports: 
+             - 3000
+        networks: 
+             - dev_mid
+
+    node_server:
+        container_name: node_server
+        build: ../server/
+        ports:
+             - 1337
+        networks: 
+             - dev_mid
+
+    nginx:
+        container_name: nginx
+        build: ../nginx/
+        restart: always
+        ports: 
+             - 80:80
+        volumes: 
+             - ../client:/var/project
+        networks:
+             - dev_mid
+
+networks: 
+    dev_mid:
+        driver: bridge
+
+volumes: 
+    mysql_server_mid-data:
+        external: true
